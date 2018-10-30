@@ -5,6 +5,8 @@ import {routerMode} from '../config/env'
 
 //懒加载组件
 const home = r => require.ensure([], () => r(require('../page/home/home')), 'home')
+const city = r => require.ensure([], () => r(require('@/page/city/city')), 'city')
+const msite = r => require.ensure([], () => r(require('@/page/msite/msite')), 'msite')
 
 Vue.use(Router)
 
@@ -22,6 +24,14 @@ export default new Router({
         {
             path: '/home',
             component: home
+        },
+        {
+            path: '/city',
+            component: city
+        },
+        {
+            path: '/msite',
+            component: msite
         },
       ]
     }

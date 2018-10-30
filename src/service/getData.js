@@ -30,3 +30,5 @@ export const getHotCity = () => {
 export const getAllCity = () => {
 	return axios.get('v1/cities/?type=all')
 }
+
+ 

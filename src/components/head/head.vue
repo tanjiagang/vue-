@@ -2,9 +2,9 @@
 	<header id="head_top">
 		<slot class="logo" name="logo">美团</slot>
 		<h3 class="head-title"></h3>
-		<div class="panel">
+		<slot name="change-panel" class="panel">
 			登录|注册
-		</div>
+		</slot>
 	</header>
 </template>
 
