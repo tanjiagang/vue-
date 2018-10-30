@@ -28,7 +28,9 @@ module.exports = {
       'vue$': 'vue/dist/vue.esm.js',
       '@': resolve('src'),
       'styles': resolve('src/assets/styles'),
-      'components': resolve('src/components')
+      'components': resolve('src/components'),
+      'tempdata': resolve('src/service/tempdata'), //临时数据路径
+      'images': resolve('src/images'), //图片路径
     }
   },
   module: {
