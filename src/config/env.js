@@ -9,12 +9,12 @@
 
 let baseUrl = ''; 
 let routerMode = 'hash';
-let imgBaseUrl = '';
+let imgBaseUrl = 'https://fuss10.elemecdn.com';
 
 
 if (process.env.NODE_ENV == 'development') {
 	baseUrl = 'http://localhost:1337'
-    imgBaseUrl = '/img/';
+    imgBaseUrl = '';
 
 }else if(process.env.NODE_ENV == 'production'){
 	// baseUrl = '//elm.cangdu.org';

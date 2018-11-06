@@ -14,6 +14,15 @@ export const getCurrentCity = () => {
 	return axios.get('v1/cities/?type=current')
 }
 
+
+/*
+*根据cityId获取城市
+*/
+
+export const getCity = (cityId) => {
+	return axios.get('v1/cities/?type=getCity&cityId=' + cityId)
+}
+
 /*
 *获取热门城市列表
 */
@@ -32,3 +41,4 @@ export const getAllCity = () => {
 }
 
  
+

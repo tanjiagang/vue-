@@ -1,7 +1,7 @@
 <template>
 	<header id="head_top">
 		<slot class="logo" name="logo">美团</slot>
-		<h3 class="head-title"></h3>
+		<slot name="head-title" class="head-title"></slot>
 		<slot name="change-panel" class="panel">
 			登录|注册
 		</slot>
@@ -32,6 +32,7 @@ export default {
 .head-title {
 	flex: 4;
 	color: #FFF;
+    text-align: center;
 }
 .logo {
 	color: #FFF;

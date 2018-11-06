@@ -2,6 +2,7 @@
 	<div>
 		<head-top go-back="true">
 			<h5 @click.stop='back' class="back" slot="logo"><</h5>
+			<div slot="head-title" class="head-title">{{cityname}}</div>
 			<router-link 
 			slot="change-panel" 
 			class="panel"
@@ -20,7 +21,7 @@
             </div>
         </form>
 
-        <header v-if="searchHistory.length" class="pois-search-history">搜索历史</header>
+        <header v-if="historytitle" class="pois-search-history">搜索历史</header>
 
         <ul class="getSearch-ul">
             <li v-for="(item, index) in searchList" @click='nextpage(index, item.geohash)' :key="index">
@@ -30,7 +31,7 @@
         </ul>
 
         <footer 
-        	v-if="searchHistory&&searchList.length" 
+        	v-if="historytitle&&searchList" 
         	class="clear-all-history" 
         	@click="clearAll">
 	        清空所有
@@ -42,6 +43,8 @@
 <script>
 import HeadTop from '@/components/head/head'
 import {getStore, setStore, removeStore} from '@/config/mUtil'
+import {getCity} from '@/service/getData'
+import {searchList, currentcity} from '@/service/getData2'
 import axios from 'axios'
 export default {
 	name: 'City',
@@ -53,17 +56,35 @@ export default {
 			inputVaule: '',//搜素值
 			searchHistory: [], //搜素历史城市列表
 			searchList: [], //搜索城市列表
+			cityid: 45,//当前城市的ID
 			searchNone: false,
+			cityname: '',
+            historytitle: true, // 默认显示搜索历史头部，点击搜索后隐藏
 		}
 	},
 	methods: {
+		initData(){
+                //获取搜索历史记录
+                if (getStore('searchHistory')) {
+                    this.searchList = JSON.parse(getStore('searchHistory'));
+                }else{
+                    this.searchHistory = [];
+                }
+        },
 		back () {
 			this.$router.go(-1)
 		},
-		async submit () {
+		submit () {
 			if (!this.inputVaule) return
-			this.searchList = (await axios.get('http://elm.cangdu.org/v1/pois?type=search&city_id=45&keyword=' + this.inputVaule)).data
-			this.searchNone = searchList.length ? false : true
+			// axios.get('http://elm.cangdu.org/v1/pois?type=search&city_id=' + this.cityId + '&keyword=' + this.inputVaule).then((data) => {
+   //              this.searchList = data
+   //              this.searchNone = this.searchList.length ? false : true    
+   //          })
+            searchList(this.cityid, this.inputVaule).then(res => {
+                        this.historytitle = false;
+                        this.searchList = searchList;
+                        this.searchList = res.length? false : true;})
+			
 		},
 		/**
          * 点击搜索结果进入下一页面时进行判断是否已经有一样的历史记录
@@ -87,15 +108,21 @@ export default {
                 this.searchHistory.push(city)
             }
             setStore('searchHistory',this.searchHistory)
-            this.$router.push({path:'/msite', query:{geohash}})
+            this.$router.push({path:'/msite', query:{'geohash': geohash}})
         },
         clearAll(){
             removeStore('searchHistory');
-            this.initData();
+            this.initData()
         }
 	},
-	mounted () {
-		
+	async created () {
+        //获取当前城市名字
+        this.cityid = this.$route.params.cityid
+        this.cityname = await currentcity(this.cityid).name
+
+	},
+	mounted () {        
+        this.initData()
 	}
 }
 </script>

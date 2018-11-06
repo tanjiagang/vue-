@@ -32,6 +32,22 @@ http.createServer((req, res) => {
 			res.end(JSON.stringify({"currentCity": "南宁"}))
 		}
 
+		//根据ID获取当前城市
+		if (query.type == 'getCity') {
+			read('./tempdata/allCitys.json', (data) => {
+				res.setHeader('Content-type', 'application/json;charset=utf8')
+				let result = ''
+				let citys = data
+				for (key in citys) {
+					citys[key].forEach((item) => {
+						if (item.id == query.cityId)
+							result = item; 
+					})
+				}
+				res.end(JSON.stringify(result))
+			})
+		}
+
 
 		//获取热门城市
 		if (query.type == 'hot') {
