@@ -10,6 +10,8 @@ const msite = r => require.ensure([], () => r(require('@/page/msite/msite')), 'm
 const search = r => require.ensure([], () => r(require('@/page/search/search')), 'search')
 const order = r => require.ensure([], () => r(require('@/page/order/order')), 'order')
 const profile = r => require.ensure([], () => r(require('@/page/profile/profile')), 'profile')  
+const shop = r => require.ensure([], () => r(require('@/page/shop/shop')), 'shop')
+const login = r => require.ensure([], () => r(require('@/page/login/login')), 'login')  
 
 Vue.use(Router)
 
@@ -47,6 +49,14 @@ export default new Router({
         {
             path: '/profile',
             component: profile
+        },
+        {
+            path: '/shop',
+            component: shop
+        },
+        {
+            path: '/login',
+            component: login
         }
       ]
     }

@@ -5,7 +5,6 @@ body, div, span, header, footer, nav, section, aside, article, ul, dl, dt, dd, l
     font-style: normal;
     text-decoration: none;
     border: none;
-    color: #333;
     font-weight: normal;
     font-family: "Microsoft Yahei";
     box-sizing: border-box;
@@ -17,6 +16,10 @@ body, div, span, header, footer, nav, section, aside, article, ul, dl, dt, dd, l
 }
 .clearfix {
     clear: both;
+}
+input:focus {
+    border: none;
+    outline: none;
 }
 /*定义滚动条高宽及背景 高宽分别对应横竖滚动条的尺寸*/  
 ::-webkit-scrollbar  
@@ -45,8 +48,10 @@ body, div, span, header, footer, nav, section, aside, article, ul, dl, dt, dd, l
 input[type="button"], input[type="submit"], input[type="search"], input[type="reset"] {
     -webkit-appearance: none;
 }
-
-textarea { -webkit-appearance: none;}   
+input:focus,
+textarea:focus { 
+    -webkit-appearance: none;
+}   
 
 html,body{
     height: 100%;

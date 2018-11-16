@@ -1,21 +1,46 @@
 import getCurrentCity from '@/config/mUtil'
-import * as Types from './mutation-types'
+import {
+	getUser,
+	getAddressList
+} from '@/service/getData2'
+import {
+	GET_USERINFO,
+	RECORD_ADDRESS,
+	SAVE_GEOHASH
+} from './mutation-types.js'
 
 export default {
+	async getUserInfo ({
+		commit,
+		state
+	}) {
+		let res = await getUser()
+		commit(GET_USERINFO, res)
+	},
+
+	async saveAddress({
+		commit,
+		state
+	}) {
+
+		if(state.removeAddress.length > 0) return;
+		let addres = await getAddressList(state.userInfo.user_id);
+		commit(SAVE_ADDRESS, addres);	
+	},
+
 	//保存当前城市geohash
-	[Types.SAVE_GEOHASH]({
+	[SAVE_GEOHASH]({
 		commit,
 		state
 	}, geohash) {
-		commit(Types.SAVE_GEOHASH, geohash)
+		commit(SAVE_GEOHASH, geohash)
 	},
 
 	//保存当前城市地理位置(经纬度)
-	[Types.RECORD_ADDRESS] ({
+	[RECORD_ADDRESS] ({
 		commit,
 		state
 	}, res) {
-		state.latitude = res.latitude
-		state.longitude = res.longitude
+		commit(RECORD_ADDRESS, res)
 	}
 }

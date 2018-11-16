@@ -43,7 +43,6 @@
 <script>
 import HeadTop from '@/components/head/head'
 import {getStore, setStore, removeStore} from '@/config/mUtil'
-import {getCity} from '@/service/getData'
 import {searchList, currentcity} from '@/service/getData2'
 import axios from 'axios'
 export default {
@@ -76,15 +75,12 @@ export default {
 		},
 		submit () {
 			if (!this.inputVaule) return
-			// axios.get('http://elm.cangdu.org/v1/pois?type=search&city_id=' + this.cityId + '&keyword=' + this.inputVaule).then((data) => {
-   //              this.searchList = data
-   //              this.searchNone = this.searchList.length ? false : true    
-   //          })
             searchList(this.cityid, this.inputVaule).then(res => {
-                        this.historytitle = false;
-                        this.searchList = searchList;
-                        this.searchList = res.length? false : true;})
-			
+                this.historytitle = false
+                this.searchList = res
+                this.searchNone = res.length? false : true
+            })
+            
 		},
 		/**
          * 点击搜索结果进入下一页面时进行判断是否已经有一样的历史记录
@@ -115,10 +111,12 @@ export default {
             this.initData()
         }
 	},
-	async created () {
+	created () {
         //获取当前城市名字
         this.cityid = this.$route.params.cityid
-        this.cityname = await currentcity(this.cityid).name
+        currentcity(this.cityid).then(res=>{
+            this.cityname = res.name
+        })
 
 	},
 	mounted () {        

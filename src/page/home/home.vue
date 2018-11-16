@@ -36,7 +36,7 @@
 		<section class="group_city_container">
             <ul class="letter_classify">
                 <li 
-                	v-for="(value, key, index) in allCitys" 
+                	v-for="(value, key, index) in sortgroupcity" 
                 	:key="key"  
                 	class="letter_classify_li">
                     <h4 class="city_title">{{key}}
@@ -61,7 +61,7 @@
 <script>
 import HeadTop from '@/components/head/head'
 import * as Types from '@/store/mutation-types'
-import {getHotCity, getAllCity, getCurrentCity} from '@/service/getData'
+import {hotcity, groupcity, cityGuess} from '@/service/getData2'
 export default {
 	name: 'Home',
 	components: {
@@ -76,21 +76,34 @@ export default {
 	},
 	methods: {
 		getHotCitys () {
-			getHotCity().then((data)=>{
+			hotcity().then((data)=>{
 				this.hotCitys = data;
-			})		
+			})
+
 		},
 		getAllCity () {
-			getAllCity().then((data) => {
+			groupcity().then((data) => {
 				this.allCitys = data
 			})	
 		},
 		getCurrentCity () {
-			getCurrentCity().then((data) => {
-				this.currentCity = data['currentCity']
+			cityGuess().then((data) => {
+				this.currentCity = data.name
 			})
 		}
 	},
+	computed:{
+        //将获取的数据按照A-Z字母开头排序
+        sortgroupcity(){
+            let sortobj = {};
+            for (let i = 65; i <= 90; i++) {
+                if (this.allCitys[String.fromCharCode(i)]) {
+                    sortobj[String.fromCharCode(i)] = this.allCitys[String.fromCharCode(i)];
+                }
+            }
+            return sortobj
+        }
+    },
 	created () {
 		this.getHotCitys()
 		this.getAllCity()

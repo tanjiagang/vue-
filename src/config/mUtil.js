@@ -9,6 +9,8 @@ export const setStore = (name, content) => {
 	window.localStorage.setItem(name, content);
 }
 
+
+
 /**
  * 获取localStorage
  */
@@ -16,6 +18,8 @@ export const getStore = name => {
 	if (!name) return;
 	return window.localStorage.getItem(name);
 }
+
+
 
 /**
  * 删除localStorage
@@ -273,4 +277,19 @@ export const animate = (element, target, duration = 400, mode = 'ease-out', call
             }
         })
     }, 20);
+}
+
+//处理图片
+export const getImagePath = path => {
+    let suffix;
+    if (!path) {
+        return '//elm.cangdu.org/img/default.jpg'
+    }
+    if (path.indexOf('jpeg') !== -1) {
+        suffix = '.jpeg'
+    } else {
+        suffix = '.png'
+    }
+    let url = '/' + path.substr(0, 1) + '/' + path.substr(1, 2) + '/' + path.substr(3) + suffix;
+    return 'https://fuss10.elemecdn.com' + url
 }

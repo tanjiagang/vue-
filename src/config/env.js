@@ -14,13 +14,13 @@ let imgBaseUrl = 'https://fuss10.elemecdn.com';
 
 if (process.env.NODE_ENV == 'development') {
 	baseUrl = 'http://localhost:1337'
-    imgBaseUrl = '';
+    imgBaseUrl = 'http://localhost:8080/img/';
 
 }else if(process.env.NODE_ENV == 'production'){
 	// baseUrl = '//elm.cangdu.org';
  //    imgBaseUrl = '//elm.cangdu.org/img/';
  	baseUrl = 'http://localhost:1337';
- 	imgBaseUrl = 'images/';
+ 	imgBaseUrl = 'http://localhost:8080/img/';
 }
 
 export {

@@ -3,14 +3,40 @@
 		<slot class="logo" name="logo">美团</slot>
 		<slot name="head-title" class="head-title"></slot>
 		<slot name="change-panel" class="panel">
-			登录|注册
+            <router-link :to="userInfo? '/profile':'/login'">
+                <svg class="user_avatar" v-if="userInfo">
+                    <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#user"></use>
+                </svg>
+    			 登录|注册
+            </router-link>
 		</slot>
 	</header>
 </template>
 
 <script>
+import {mapState, mapActions} from 'vuex'
 export default {
-	name: 'Head',
+    data(){
+        return{
+
+        }
+    },
+    mounted(){
+        //获取用户信息
+        this.getUserInfo();
+    },
+    // props: ['signinUp', 'headTitle', 'goBack'],
+    computed: {
+        ...mapState([
+            'userInfo'
+        ]),
+    },
+    methods: {
+        ...mapActions([
+            'getUserInfo'
+        ]),
+    },
+
 }
 </script>
 
@@ -33,12 +59,18 @@ export default {
 	flex: 4;
 	color: #FFF;
     text-align: center;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+    padding: 0 1rem;
 }
 .logo {
 	color: #FFF;
+    flex: 1;
 }
 .panel {
 	color: #FFF;
+    flex: 1;
 }
 .head_goback{
     left: 0.4rem;

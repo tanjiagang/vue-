@@ -2,7 +2,7 @@
 	<div>
 		<ul class="shopList-wrap">
 			<router-link 
-				to="/shop"
+				:to="{path: '/shop', query: {geohash, id: item.id}}"
 				tag="li"
 				class="shop_li"
 				v-for="(item, index) in shopListArr"
@@ -59,7 +59,7 @@ import RatingStar from '@/components/ratingStar'
 import Loading from '@/components/loading'
 import {imgBaseUrl} from '@/config/env'
 import {shopList} from '@/service/getData2'
-import {getImgPath} from './mixins'
+import {getImgPath} from '@/components/mixins'
 export default {
 	name: 'ShopList',
 	props: [

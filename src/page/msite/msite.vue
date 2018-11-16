@@ -17,7 +17,7 @@
 		            	v-for="(item, index) in foodTypes" 
 		            	:key="index">
 	            		<router-link :to="{path: '/food', query: {geohash, title: foodItem.title, restaurant_category_id: ''}}" v-for="foodItem in item" :key="foodItem.id" class="link-to-food">
-	            			<figure>
+	            			<figure ref="test">
 	            				<img :src="imgBaseUrl + foodItem.image_url">
 	            				<figcaption>{{foodItem.title}}</figcaption>
 	            			</figure>
@@ -75,7 +75,6 @@ export default {
 			const address = await (axios.get('http://elm.cangdu.org/v1/cities/?type=guess'))
 			this.geohash = address.latitude + ',' + address.longitude
 			
-			
 		}else{
 			this.geohash = this.$route.query.geohash
 		}
@@ -110,6 +109,7 @@ export default {
 		    loop: true
 			});
 		})
+
 	}
 }
 </script>
