@@ -1,13 +1,16 @@
 <template>
 	<header id="head_top">
-		<slot class="logo" name="logo">美团</slot>
+		<slot class="logo" name="logo">elm</slot>
 		<slot name="head-title" class="head-title"></slot>
 		<slot name="change-panel" class="panel">
-            <router-link :to="userInfo? '/profile':'/login'">
-                <svg class="user_avatar" v-if="userInfo">
-                    <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#user"></use>
-                </svg>
-    			 登录|注册
+            <router-link tag="span" :to="userInfo? '/profile':'/login'">
+                <span class="user_avatar" v-if="userInfo">
+                    个人中心
+                </span>
+                <span v-else>
+                    登录|注册
+                </span>
+    			 
             </router-link>
 		</slot>
 	</header>

@@ -2,17 +2,26 @@
 	<div class="menu-wrap" ref="test">
 		<ul class="menu-left">
 			<li 
+				@click="scrollMenu"
 				v-for="(item, index) in foodMenu"
 				:key="index"
+				:data-index="index"
+				:id="item.id.toString()"
+				:class="{activity_li: mIndex == index }"
 				>
 				<img v-if="item.icon_url" :src="getImagePath(item.icon_url)"/>
 				{{item.name}}
+				<span 
+					class="category_num" 
+					></span>
 			</li>
 		</ul>
 
 		<ul class="menu-right">
 			<li
+				class="menu-right-item"
 				v-for="(item, index) in foodMenu"
+				:data-index="index"
 			>
 				<header >
 					<span>{{item.name}}</span>
@@ -33,9 +42,12 @@
 						<ul  
 							class="buy-btn" 
 							:price="foodItem.specfoods[0].price"
-							:food-name="foodItem.name"
-							:item-id="foodItem.item_id"
+							:name="foodItem.name"
+							:item_id="foodItem.item_id"
 							:image-url="imgBaseUrl + foodItem.image_path"
+							:category_id="item.id"
+							:food_id="foodItem.specfoods[0].food_id"
+							:specs="JSON.stringify(foodItem.specfoods[0].specs)"
 							>
 							<li @click.stop="jianBuy()" class="jian">-</li>
 							<li class="shop-num">0</li>
@@ -52,22 +64,141 @@
 
 <script>
 import {foodMenu} from '@/service/getData2'
-import {getImagePath} from '@/config/mUtil'
+import {getImagePath, getStore, setStore, animate, log} from '@/config/mUtil'
+import {mapState, mapMutations} from 'vuex'
 export default {
 	name: 'foodList',
 	data () {
 		return {
 			foodMenu: [],
-			imgBaseUrl: 'http://localhost:8000/img/',
+			imgBaseUrl: '//elm.cangdu.org/img/',
 			shopNum: 1, //
+			menuActive: false,
+			mIndex: 0, //左侧菜单选中项
 		}
 	},
 	props: ['shopId'],
+	computed: {
+		...mapState([
+			'latitude','longitude','cartList'		
+		])
+	},
+	watch: {
+		cartList () {
+			setTimeout(()=>{
+				if (Object.values(this.cartList).length) {
+					Object.values(this.cartList).forEach(shop => {
+						if(!shop) return
+						
+	                    Object.values(shop).forEach(categoryItem =>{
+	                    	var num = 0
+	                    	var menuLeftItem = document.getElementById(categoryItem['category_id'])
+	                    	// log(menuLeftItem)
+	                    	// return
+	                    	Object.values(categoryItem).forEach(itemValue=> {
+		                        Object.values(itemValue).forEach(item => {
+		                        	if(!item || isNaN(item.num)) return
+		                        	num += item.num
+		                        })
+		                        var category_num = menuLeftItem.getElementsByClassName('category_num')[0]
+		                        if(num > 0){
+		                        	category_num.style.opacity = 1
+		                        	category_num.innerText = num
+		                        } else {
+		                        	category_num.style.opacity = 0
+		                        }
+		                    })
+	                    })
+	                })
+				}
+			}, 200)
+		}
+	},
 	methods: {
+		...mapMutations([
+			'RECORD_ADDRESS',
+			'ADD_CART',
+			'REDUCE_CART',
+			'INIT_BUYCART',
+			'CLEAR_CART',
+			'RECORD_SHOPDETAIL',
+			'INIT_cartList'
+		]),
 		async initData () {
 			this.foodMenu = await foodMenu(this.shopId)
-			
+			if(!this.foodMenu.length){
+				this.foodMenu = 
+		[{
+		"name": "优惠",
+		"description": "美味又实惠, 大家快来抢!",
+		"id": 3210,
+		"restaurant_id": 3269,
+		"foods": [{
+			"_id": "5bfd1f39d51a913e8655d962",
+			"tips": "673评价 月售540份",
+			"item_id": 1627,
+			"category_id": 3210,
+			"restaurant_id": 3269,
+			"activity": {
+				"image_text_color": "f1884f",
+				"icon_color": "f07373",
+				"image_text": "肯德基买一什么都不送！！！！"
+			},
+			"image_path": "16754c1ee2d22822.jpg",
+			"name": "肯德基",
+			"__v": 0,
+			"specfoods": [{
+				"specs_name": "默认",
+				"name": "肯德基",
+				"item_id": 1627,
+				"sku_id": 5814,
+				"food_id": 5814,
+				"restaurant_id": 3269,
+				"_id": "5bfd1f39d51a913e8655d963",
+				"specs": [],
+				"stock": 1000,
+				"checkout_mode": 1,
+				"is_essential": false,
+				"recent_popularity": 251,
+				"sold_out": false,
+				"price": 20,
+				"promotion_stock": -1,
+				"recent_rating": 1,
+				"packing_fee": 0,
+				"pinyin_name": "",
+				"original_price": 0
+			}],
+			"satisfy_rate": 19,
+			"satisfy_count": 666,
+			"attributes": [{
+				"icon_color": "5ec452",
+				"icon_name": "新"
+			}, {
+				"icon_color": "f07373",
+				"icon_name": "招牌"
+			}],
+			"is_essential": false,
+			"server_utc": "2018-11-26T14:59:19.853Z",
+			"specifications": [],
+			"rating_count": 673,
+			"month_sales": 540,
+			"description": "肯德基豪华套餐",
+			"attrs": [],
+			"display_times": [],
+			"pinyin_name": "",
+			"is_featured": 0,
+			"rating": 4.6
+			}],
+		"type": 1,
+		"icon_url": "4735c4342691749b8e1a531149a46117jpeg",
+		"is_selected": true,
+		"__v": 1
+		}]
+
+
+			}
 		},
+		//处理图片
 		getImagePath (path) {
 			let suffix;
 			if (!path) {
@@ -83,32 +214,45 @@ export default {
 		},
 		//加入购物车
 		jiaBuy (_this, e) {
-			let cartList = JSON.parse(window.localStorage.getItem('cartList')) || {}
-			if (!cartList[this.shopId]) {
-				cartList[this.shopId] = []	
-			}
-			
-			let current =  _this || window.event.target
+			let cartList = JSON.parse(getStore('cartList')) //获取本地购物车数据
+			var e = arguments[0] || window.event
+			let current =  _this || e.target
 			let parent = current.parentNode
 			let jian = parent.getElementsByClassName('jian')[0]
 			let shopNum = parent.getElementsByClassName('shop-num')[0]
 			let num = parseInt(shopNum.innerText)
 
-			//本地存储购物车
+			/*
+			*本地存储购物车数据
+			*/
+
+			//获取存储在元素属性上的接口数据
 			let price = parent.getAttribute('price')
-			let foodName = parent.getAttribute('food-name')
-			let itemId = parent.getAttribute('item-id')
+			let name = parent.getAttribute('name')
+			let item_id = parent.getAttribute('item_id')
 			let imageUrl = parent.getAttribute('image-url')
+			let category_id=parent.getAttribute('category_id')
+			let food_id=parent.getAttribute('food_id')
+			let specs=parent.getAttribute('specs')
 
 			if (_this) {
 				//初始化购物车数据
-				cartList[this.shopId].forEach(item => {
-					if(item.itemId == itemId){
-						shopNum.innerText = item.num
-						jian.classList.add('show-li')
-						shopNum.classList.add('show-li')
+				let shop = cartList[this.shopId]
+				if (shop) {
+
+					let category = shop[category_id]
+					if (category) {
+						let item = category[item_id]
+						if (item) {
+							let food = item[food_id]
+							if (food.num !== 0) {
+								shopNum.innerText = food.num
+								jian.classList.add('show-li')
+								shopNum.classList.add('show-li')	
+							}
+						}
 					}
-				})
+				}
 				return
 			}
 
@@ -116,74 +260,59 @@ export default {
 			shopNum.classList.add('show-li')
 			shopNum.innerText = ++num
 
-
-			if (num > 1)  {
-				//购买数量增加
-				cartList[this.shopId].forEach(item => {
-					if(item.itemId == itemId){
-						item.num = num
-					}
-				})
-			} else {
-				//新增加食物
-				let food = {
-					"itemId": itemId,
-					"foodName": foodName,
-					"price": price,
-					"num": num,
-					"image_url": imageUrl
-				}
-				cartList[this.shopId].push(food)
-			}
-			window.localStorage.setItem('cartList', JSON.stringify(cartList))
-
-			//更新父组件的购物车
-			this.$emit('cartChange')
+			//加入vuex中的购物车，所需7个参数，商铺id，食品分类id，食品id，食品规格id，食品名字，食品价格，食品规格
+            this.ADD_CART({shopid: this.shopId, category_id, item_id, food_id, name, price, specs});
+            //更新父组件购物车
+            this.$emit('cartChange')
 		},
 		//从购物车减去
 		jianBuy (e) {
-			let cartList = JSON.parse(window.localStorage.getItem('cartList'))
+			let cartList = JSON.parse(getStore('cartList'))
 			e = window.event || e
 			let current = e.target
 			let parent = current.parentNode
 			let shopNum = parent.getElementsByClassName('shop-num')[0]
-			let itemId = parent.getAttribute('item-id')
+			let item_id = parent.getAttribute('item_id')
 			let num = parseInt(shopNum.innerText)
+			let name=parent.getAttribute('name')
+			let price=parent.getAttribute('price')
+			let category_id=parent.getAttribute('category_id')
+			let food_id=parent.getAttribute('food_id')
+			let specs=parent.getAttribute('specs')
+
 			if (num <= 1) {
 				current.classList.remove('show-li')
 				shopNum.classList.remove('show-li')
 			}
 			shopNum.innerText = --num;	
 			
-
-			if (num < 1)  {
-				//在购物车中移除食品
-				cartList[this.shopId].forEach((item, index, array) => {
-					if(item.itemId == itemId)
-						cartList[this.shopId].splice(index, 1)
-				})
-			} else {
-				//减少数量
-				cartList[this.shopId].forEach((item, index, array) => {
-					if(item.itemId == itemId)
-						item.num = num						
-				})
-			}
-			//本地存储
-			window.localStorage.setItem('cartList', JSON.stringify(cartList))
-			//更新父组件的购物车
-			this.$emit('cartChange')
+			//移出vuex中的购物车，所需7个参数，商铺id，食品分类id，食品id，食品规格id，食品名字，食品价格，食品规格
+			this.REDUCE_CART({shopid: this.shopId, category_id, item_id, food_id, name, price, specs})
+			//更新父组件购物车
+            this.$emit('cartChange')
+		},
+		//滑动菜单
+		scrollMenu (e) {
+			var e = arguments[0] || window.event
+			let index = e.target.getAttribute('data-index')
+			this.mIndex = index
+			let menuRight = document.getElementsByClassName('menu-right')[0]
+			let menuRightItem = document.getElementsByClassName('menu-right-item')[index]
+			animate(menuRight, {scrollTop: menuRightItem.offsetTop})
 		}
 	},
 	mounted () {
 		this.initData()
+		this.INIT_cartList()
 		var _this = this
-		setTimeout( () =>{
-			this.$refs.buyBtn.forEach((item, index, array)=>{
-				_this.jiaBuy(this.$refs.buyBtn[index])
-			})
-			// console.log(Array.isArray(this.$refs.buyBtn))
-		}, 200)
+		this.$nextTick( ()=>{
+			setTimeout(()=>{
+				if(!Array.isArray(this.$refs.buyBtn)) return
+				this.$refs.buyBtn.forEach((item, index, array)=>{
+					_this.jiaBuy(this.$refs.buyBtn[index])
+				})	
+			},200)
+		})
 	}
 }
 </script>
@@ -192,7 +321,10 @@ export default {
 @import '~@/style/mixin';
 .menu-wrap {
 	display: flex;
+
 	.menu-left {
+		flex: 1;
+		width: 30%;
 		background: #FFF;
 		li{
 			padding: .7rem .3rem;
@@ -201,20 +333,45 @@ export default {
 		    box-sizing: border-box;
 		    border-left: 0.15rem solid #f8f8f8;
 		    position: relative;
+		    word-wrap: berak-word;
+		    background: #f7f4f4;
 		    @include font(.8rem, 1rem)
 		    img {
 			    width: 0.5rem;
 	    		height: 0.6rem;
 		    }
 		}
+		li:hover {
+			border-left: 0.15rem solid #3190e8;
+    		background-color: #fff;
+		}
 		.activity_li {
 			border-left: 0.15rem solid #3190e8;
     		background-color: #fff;
 		}
+		.category_num{
+	        position: absolute;
+	        opacity: 0;
+	        top: .1rem;
+	        right: .1rem;
+	        background-color: #ff461d;
+	        line-height: .6rem;
+	        text-align: center;
+	        border-radius: 50%;
+	        border: 0.025rem solid #ff461d;
+	        min-width: .6rem;
+	        height: .6rem;
+	        @include sc(.5rem, #fff);
+	        font-family: Helvetica Neue,Tahoma,Arial;
+        }
 	}
 
 	.menu-right {
 		flex: 4;
+		width: 70%;
+		height: 70vh;
+		overflow-y: auto;
+		position: relative;
 		header {
 			padding: .8rem;
 			color: #AAA;

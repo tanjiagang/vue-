@@ -1,203 +1,225 @@
-<template>
-	<div>
-		<head-top>
-			<h4 class="logo" slot="logo">美团</h4>
-		</head-top>
-
-		<div class="city-nav">
-			<div class="city-tip">
-				<span>当前定位城市:</span>
-				<span>定位不准时，请在城市列表中选择</span>
-			</div>
-		</div>
-
-		<router-link :to="'/city/45'" class="current-city">
-			{{currentCity}}
-			<span class="arrow_right">
-                  >  
-            </span>
-		</router-link>
-
-		<div class="hotCitys">
-			<h5>热门城市</h5>
-			<ul>
-				<router-link
-					v-for="(city, index) of hotCitys"
-					:key="index"
-					:to="'/city/' + city.id"
-					tag="li"
-					>
-					{{city.name}}
-				</router-link>
-				<div class="clearfix"></div>
-			</ul>
-		</div>
-
-		<section class="group_city_container">
-            <ul class="letter_classify">
-                <li 
-                	v-for="(value, key, index) in allCitys" 
-                	:key="key"  
-                	class="letter_classify_li">
-                    <h4 class="city_title">{{key}}
-                        <span v-if="index == 0">（按字母排序）</span>
-                    </h4>
-                    <ul class="groupcity_name_container citylistul clear">
-                        <router-link
-                          tag="li" 
-                          v-for="item in value" 
-                          :to="'/city/' + item.id" 
-                          :key="item.id" 
-                          class="ellipsis">
-                            {{item.name}}
-                        </router-link>  
-                    </ul>
-                </li>
-            </ul>
-        </section>
-	</div>
+ <template>
+    <div class="order_page">
+        <head-top head-title="订单列表" go-back='true'></head-top>
+        <ul class="order_list_ul" v-load-more="loaderMore">
+            <li class="order_list_li" v-for="item in orderList" :key="item.id">
+                <img :src="imgBaseUrl + item.restaurant_image_url" class="restaurant_image">
+                <section class="order_item_right">
+                    <section @click="showDetail(item)">
+                        <header class="order_item_right_header">
+                            <section class="order_header">
+                                <h4 >
+                                    <span class="ellipsis">{{item.restaurant_name}} </span>
+                                    <svg fill="#333" class="arrow_right">
+                                        <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#arrow-right"></use>
+                                    </svg>
+                                </h4>
+                                <p class="order_time">{{item.formatted_created_at}}</p>
+                            </section>
+                            <p class="order_status">
+                                {{item.status_bar.title}}
+                            </p>
+                        </header>
+                        <section class="order_basket">
+                            <p class="order_name ellipsis">{{item.basket.group[0][0].name}}{{item.basket.group[0].length > 1 ? ' 等' + item.basket.group[0].length + '件商品' : ''}}</p>
+                            <p class="order_amount">¥{{item.total_amount.toFixed(2)}}</p>
+                        </section>
+                    </section>
+                    <div class="order_again">
+                        <compute-time v-if="item.status_bar.title == '等待支付'" :time="item.time_pass"></compute-time>
+                        <router-link :to="{path: '/shop', query: {geohash, id: item.restaurant_id}}" tag="span" class="buy_again" v-else>再来一单</router-link>
+                    </div>
+                </section>
+            </li>
+        </ul>
+        <foot-guide></foot-guide>
+        <transition name="loading">
+            <loading v-show="showLoading"></loading>
+        </transition>
+        <transition name="router-slid" mode="out-in">
+            <router-view></router-view>
+        </transition>
+ 
+    </div>
 </template>
 
 <script>
-import HeadTop from '@/components/head/head'
-import * as Types from '@/store/mutation-types'
-import {getHotCity, getAllCity, getCurrentCity} from '@/service/getData'
-export default {
-	name: 'Home',
-	components: {
-		 HeadTop,
-	},
-	data () {
-		return {
-			currentCity: '',
-			hotCitys: [],
-			allCitys: []
-		}
-	},
-	methods: {
-		getHotCitys () {
-			getHotCity().then((data)=>{
-				this.hotCitys = data;
-			})		
-		},
-		getAllCity () {
-			getAllCity().then((data) => {
-				this.allCitys = data
-			})	
-		},
-		getCurrentCity () {
-			getCurrentCity().then((data) => {
-				this.currentCity = data['currentCity']
-			})
-		}
-	},
-	created () {
-		this.getHotCitys()
-		this.getAllCity()
-		this.getCurrentCity()
-	},
-	mounted () {
-	
-	}
-}
-</script>
+    import {mapState, mapMutations} from 'vuex'
+    import headTop from '@/components/head/head'
+    import computeTime from '@/components/computeTime'
+    import loading from '@/components/loading'
+    import {getImgPath} from '@/components/mixins'
+    import footGuide from '@/components/footer/footerNav'
+    import {getOrderList} from '@/service/getData2'
+    import {loadMore} from '@/config/mUtil'
+    import {imgBaseUrl} from '@/config/env'
 
-<style lang="scss" scoped>
-@import '~@/style/mixin';
 
-.city-nav {
-	padding-top: 2.35rem;
-	padding-bottom: .2rem;
-	border-bottom: 1px solid #ccc;
-	font-size: .5rem;
-	background: #FFF;
-	color: #999;
-	// margin-bottom: 0.4rem;
-	.city-tip {
-		padding: .2rem;
-	}
-	.city-tip span:last-child {
-		float: right;
-		color: #9F9F9F;
-		@include font(.6rem, 1rem);
-	}
-}
-
-.current-city{
-    @include fj;
-    align-items: center;
-    height: 1.8rem;
-    padding: 0 0.45rem;
-    border-top: 1px solid $bc;
-    background: #FFF;
-    border-bottom: 2px solid $bc;
-    @include font(0.75rem, 1.8rem);
-    .arrow_right{
-    	@include font(1rem, 1rem)
-    	color: #999;
-    }
-}
-
-.hotCitys {
-	background-color: #fff;
-    margin-bottom: 0.4rem;
-	h5 {
-		color: #666;
-	    font-weight: 400;
-	    text-indent: 0.45rem;
-	    padding: .1rem;
-	    border-top: 2px solid #e4e4e4;
-	    border-bottom: 1px solid #e4e4e4;
-	    @include font(.4rem)
-	}
-	ul li {
-		float: left;
-	    text-align: center;
-	    color: #3190e8;
-	    background: #FFF;
-	    border-bottom: 0.025rem solid $bc;
-	    border-right: 0.025rem solid $bc;
-	    width: 25%;
-	    height: 1.75rem;
-	    font: 0.6rem/1.75rem "Microsoft YaHei";
-	}
-}
-
-.citylistul{
-    li{
-        float: left;
-        text-align: center;
-        color: $blue;
-        border-bottom: 0.025rem solid $bc;
-        border-right: 0.025rem solid $bc;
-        @include wh(25%, 1.75rem);
-        @include font(0.6rem, 1.75rem);
-    }
-    li:nth-of-type(4n){
-        border-right: none;
-    }
-}
-.city_title{
-    color: #666;
-    font-weight: 400;
-    text-indent: 0.45rem;
-    border-top: 2px solid $bc;
-    border-bottom: 1px solid $bc;
-    @include font(0.55rem, 1.45rem, "Helvetica Neue");
-    span{
-        @include sc(0.475rem, #999);
-    }
-}
-
-.letter_classify_li{
-    margin-bottom: 0.4rem;
-    background-color: #fff;
-    border-bottom: 1px solid $bc;
-    .groupcity_name_container{
-        li{
-            color: #666;
+    export default {
+      data(){
+            return{
+                orderList: null, //订单列表
+                offset: 0, 
+                preventRepeat: false,  //防止重复获取
+                showLoading: true, //显示加载动画
+                imgBaseUrl
+            }
+        },
+        mounted(){
+            this.initData();
+        },
+        mixins: [loadMore],
+        components: {
+            headTop,
+            footGuide,
+            loading,
+            computeTime,
+        },
+        computed: {
+            ...mapState([
+                'userInfo', 'geohash'
+            ]),
+        },
+        methods: {
+             ...mapMutations([
+               'SAVE_ORDER'
+            ]),
+            //初始化获取信息
+            async initData(){
+                if (this.userInfo && this.userInfo.user_id) {
+                    let res = await getOrderList(this.userInfo.user_id, this.offset);
+                    this.orderList = [...res];
+                    this.hideLoading();
+                }else{
+                    this.hideLoading();
+                }
+            },
+            //加载更多
+            async loaderMore(){
+                if (this.preventRepeat) {
+                    return
+                }
+                this.preventRepeat = true;
+                this.showLoading = true;
+                this.offset += 10;
+                //获取信息
+                let res = await getOrderList(this.userInfo.user_id, this.offset);
+                this.orderList = [...this.orderList, ...res];
+                this.hideLoading();
+                if (res.length < 10) {
+                    return
+                }
+                this.preventRepeat = false;
+            },
+            //显示详情页
+            showDetail(item){
+                this.SAVE_ORDER(item);
+                this.preventRepeat = false;
+                this.$router.push('/order/orderDetail');
+            },
+            //生产环境与发布环境隐藏loading方式不同
+            hideLoading(){
+                this.showLoading = false;
+            },
+        },
+        watch: {
+            userInfo: function (value) {
+                if (value && value.user_id && !this.orderList) {
+                    this.initData();
+                }
+            }
         }
     }
-}
+</script>
+  
+<style lang="scss" scoped>
+    @import 'src/style/mixin';
+    
+    .order_page{
+        background-color: #f1f1f1;
+        margin-bottom: 1.95rem;
+        p, span, h4{
+            font-family: Helvetica Neue,Tahoma,Arial;
+        }
+    }
+    .order_list_ul{
+        padding-top: 1.95rem;
+        .order_list_li{
+            background-color: #fff;
+            display: flex;
+            margin-bottom: 0.5rem;
+            padding: .6rem .6rem 0;
+            .restaurant_image{
+                @include wh(2rem, 2rem);
+                margin-right: 0.4rem;
+            }
+            .order_item_right{
+                flex: 5;
+                .order_item_right_header{
+                    border-bottom: 0.025rem solid #f5f5f5;
+                    padding-bottom: .3rem;
+                    @include fj;
+                    .order_header{
+                        h4{
+                            display: flex;
+                            align-items: center;
+                            justify-content: flex-start;
+                            @include sc(.75rem, #333);
+                            line-height: 1rem;
+                            width: 9rem;
 
+                            .arrow_right{
+                                @include wh(.4rem, .4rem);
+                                fill: #ccc;
+                                margin-right: .2rem;
+                            }
+                        }
+                        .order_time{
+                            @include sc(.55rem, #999);
+                            line-height: .8rem;
+                        }
+                    }
+                    .order_status{
+                        @include sc(.6rem, #333);
+                    }
+                }
+                .order_basket{
+                    @include fj;
+                    line-height: 2rem;
+                    border-bottom: 0.025rem solid #f5f5f5;
+                    .order_name{
+                        @include sc(.6rem, #666);
+                        width: 10rem;
+                    }
+                    .order_amount{
+                        @include sc(.6rem, #f60);
+                        font-weight: bold;
+                    }
+                }
+                .order_again{
+                    text-align: right;
+                    line-height: 1.6rem;
+                    .buy_again{
+                        @include sc(.55rem, #3190e8);
+                        border: 0.025rem solid #3190e8;
+                        padding: .1rem .2rem;
+                        border-radius: .15rem;
+                    }
+                }
+            }
+        }
+    }
+    .loading-enter-active, .loading-leave-active {
+        transition: opacity .7s
+    }
+    .loading-enter, .loading-leave-active {
+        opacity: 0
+    }
+    .router-slid-enter-active, .router-slid-leave-active {
+        transition: all .4s;
+    }
+    .router-slid-enter, .router-slid-leave-active {
+        transform: translate3d(2rem, 0, 0);
+        opacity: 0;
+    }
 </style>

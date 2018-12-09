@@ -12,6 +12,9 @@ const order = r => require.ensure([], () => r(require('@/page/order/order')), 'o
 const profile = r => require.ensure([], () => r(require('@/page/profile/profile')), 'profile')  
 const shop = r => require.ensure([], () => r(require('@/page/shop/shop')), 'shop')
 const login = r => require.ensure([], () => r(require('@/page/login/login')), 'login')  
+const confirmOrder = r => require.ensure([], () => r(require('@/page/confirmOrder/confirmOrder')), 'confirmOrder')  
+const payment = r => require.ensure([], () => r(require('@/page/confirmOrder/childcompoents/payment')), 'payment')  
+const food = r => require.ensure([], () => r(require('@/page/food/food')), 'food')
 
 Vue.use(Router)
 
@@ -38,6 +41,11 @@ export default new Router({
             path: '/msite',
             component: msite
         },
+        //特色商铺列表页
+        {
+            path: '/food',
+            component: food
+        },
         {
             path: '/search/:geohash',
             component: search
@@ -57,6 +65,14 @@ export default new Router({
         {
             path: '/login',
             component: login
+        },
+        {
+            path: '/confirmOrder',
+            component: confirmOrder,  
+            children: [{
+                path: '/confirmOrder/payment',
+                component: payment
+            }]
         }
       ]
     }

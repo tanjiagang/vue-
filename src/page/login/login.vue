@@ -47,6 +47,7 @@ import HeadTop from '@/components/head/head'
 import alertTip from '@/components/alertTip'
 import {mobileCode, checkExsis, sendLogin, getcaptchas, accountLogin} from '@/service/getData2'
 import {mapState, mapMutations} from 'vuex'
+import axios from 'axios'
 export default {
     name: 'login',
     components: {
@@ -61,13 +62,43 @@ export default {
             mobileCode: null, //短信验证码
             validate_token: null, //获取短信时返回的验证值，登录时需要
             computedTime: 0, //倒数记时
-            userInfo: null, //获取到的用户信息
+            userInfo: {
+                "username": "1273419583",
+                "user_id": 14604,
+                "id": 14604,
+                "city": "南宁",
+                "registe_time": "2018-10-22 08:52",
+                "column_desc": {
+                    "gift_mall_desc": "0元好物在这里",
+                    "game_link": "https://gamecenter.faas.ele.me",
+                    "game_is_show": 1,
+                    "game_image_hash": "05f108ca4e0c543488799f0c7c708cb1jpeg",
+                    "game_desc": "玩游戏领红包"
+                },
+                "point": 0,
+                "mobile": "",
+                "is_mobile_valid": true,
+                "is_email_valid": false,
+                "is_active": 1,
+                "gift_amount": 3,
+                "email": "",
+                "delivery_card_expire_days": 0,
+                "current_invoice_id": 0,
+                "current_address_id": 0,
+                "brand_member_new": 0,
+                "balance": 0,
+                "avatar": "default.jpg",
+                "__v": 0
+            }, //获取到的用户信息
             userAccount: null, //用户名
             passWord: null, //密码
             captchaCodeImg: null, //验证码地址
             codeNumber: null, //验证码
             showAlert: false, //显示提示组件
-            alertText: null, //提示的内容        
+            alertText: null, //提示的内容   
+            accout: null,
+            pwd: null,
+            codeNum: null,     
         }
     },
     methods: {
@@ -113,7 +144,7 @@ export default {
                     return
                 }
                 //用户名登录
-                this.userInfo = await accountLogin(this.userAccount, this.passWord, this.codeNumber);
+                // this.userInfo = await accountLogin(this.userAccount, this.passWord, this.codeNumber);
             }
             //如果返回的值不正确，则弹出提示框，返回的值正确则返回上一页
             if (!this.userInfo.user_id) {
@@ -123,7 +154,6 @@ export default {
             }else{
                 this.RECORD_USERINFO(this.userInfo);
                 this.$router.go(-1);
-
             }
         },
         closeTip(){

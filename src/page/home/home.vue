@@ -1,7 +1,7 @@
 <template>
 	<div>
 		<head-top>
-			<h4 class="logo" slot="logo">美团</h4>
+			<h4 class="logo" slot="logo">elm</h4>
 		</head-top>
 
 		<div class="city-nav">

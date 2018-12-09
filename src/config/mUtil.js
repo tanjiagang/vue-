@@ -32,19 +32,32 @@ export const removeStore = name => {
 /**
  * 获取style样式
  */
-export const getStyle = (element, attr, NumberMode = 'int') => {
-    let target;
-    // scrollTop 获取方式不同，没有它不属于style，而且只有document.body才能用
-    if (attr === 'scrollTop') { 
-        target = element.scrollTop;
-    }else if(element.currentStyle){
-        target = element.currentStyle[attr]; 
-    }else{ 
-        target = document.defaultView.getComputedStyle(element,null)[attr]; 
+// export const getStyle = (element, attr, NumberMode = 'int') => {
+//     let target;
+//     // scrollTop 获取方式不同，没有它不属于style，而且只有document.body才能用
+//     if (attr === 'scrollTop') { 
+//         target = element.scrollTop;
+//     }else if(element.currentStyle){
+//         target = element.currentStyle[attr]; //除IE外的主流浏览器
+//     }else{ 
+//         target = document.defaultView.getComputedStyle(element,null)[attr]; //IE
+//     }
+//     //在获取 opactiy 时需要获取小数 parseFloat
+//     return  NumberMode == 'float'? parseFloat(target) : parseInt(target);
+// }
+
+export const getStyle = (element, attr, NumberMode = 'int')  => {
+    let target 
+    if (attr === 'scrollTop') {
+        target = element.scrollTop
+    } else if(element.currentStyle){
+        target = element.currentStyle[attr] //除IE以外的浏览器
+    } else {
+        target = getComputedStyle(element, null)[attr] //IE
     }
-    //在获取 opactiy 时需要获取小数 parseFloat
-    return  NumberMode == 'float'? parseFloat(target) : parseInt(target);
-} 
+    //在获取opacity时需要获取小数parsetFloat
+    return NumberMode == 'float' ? parseFloat(target) : parseInt(target)
+}
 
 /**
  * 页面到达底部，加载更多
@@ -292,4 +305,10 @@ export const getImagePath = path => {
     }
     let url = '/' + path.substr(0, 1) + '/' + path.substr(1, 2) + '/' + path.substr(3) + suffix;
     return 'https://fuss10.elemecdn.com' + url
+}
+
+
+//打印日志
+export const log = message => {
+    console.log(message)
 }

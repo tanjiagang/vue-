@@ -1,6 +1,6 @@
 <template>
 	<div>
-		<head-top signin-up='msite'>
+		<head-top >
     		<router-link :to="'/search/geohash'" class="link-search" slot="search">
 	    			
     		</router-link>
@@ -16,9 +16,9 @@
 		            	class="swiper-slide food-types-container" 
 		            	v-for="(item, index) in foodTypes" 
 		            	:key="index">
-	            		<router-link :to="{path: '/food', query: {geohash, title: foodItem.title, restaurant_category_id: ''}}" v-for="foodItem in item" :key="foodItem.id" class="link-to-food">
-	            			<figure ref="test">
-	            				<img :src="imgBaseUrl + foodItem.image_url">
+	            		<router-link :to="{path: '/food', query: {geohash, title: foodItem.title, restaurant_category_id: getCategoryId(foodItem.link)}}" v-for="foodItem in item" :key="foodItem.id" class="link-to-food">
+	            			<figure >
+	            				<img :src="'https://fuss10.elemecdn.com' + foodItem.image_url" />
 	            				<figcaption>{{foodItem.title}}</figcaption>
 	            			</figure>
 	            		</router-link>
@@ -63,7 +63,15 @@ export default {
 		}
 	},
 	methods: {
-
+		// 解码url地址，求去restaurant_category_id值
+    	getCategoryId(url){
+    		let urlData = decodeURIComponent(url.split('=')[1].replace('&target_name',''));
+    		if (/restaurant_category_id/gi.test(urlData)) {
+    			return JSON.parse(urlData).restaurant_category_id.id
+    		}else{
+    			return ''
+    		}
+    	}
 	},
 	created () {
 		
@@ -167,5 +175,8 @@ export default {
 		@include font(0.55rem, 1.6rem);	
 	}
 }
-
+.user_avatar {
+	fill: #fff;
+    @include wh(.8rem, .8rem);
+}
 </style>

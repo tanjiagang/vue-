@@ -36,13 +36,17 @@ export default {
 		specs,
 		packing_fee,
 		sku_id,
-		stock
+		stock,
 	}) {
 		let cart = state.cartList;
 		let shop = cart[shopid] = (cart[shopid] || {});
+		shop['shopId'] = shopid
 		let category = shop[category_id] = (shop[category_id] || {});
+		category['category_id'] = category_id
 		let item = category[item_id] = (category[item_id] || {});
+
 		if (item[food_id]) {
+			
 			item[food_id]['num']++;
 		} else {
 			item[food_id] = {
@@ -58,7 +62,7 @@ export default {
 		}
 		state.cartList = {...cart};
 		//存入localStorage
-		setStore('buyCart', state.cartList);
+		setStore('cartList', state.cartList);
 	},
 	// 移出购物车
 	[Types.REDUCE_CART](state, {
@@ -72,23 +76,24 @@ export default {
 	}) {
 		let cart = state.cartList;
 		let shop = (cart[shopid] || {});
-		let category = (shop[category_id] || {});
-		let item = (category[item_id] || {});
+		let category = (shop[category_id] || {})
+		let item = (category[item_id] || {})
 		if (item && item[food_id]) {
+			
 			if (item[food_id]['num'] > 0) {
 				item[food_id]['num']--;
-				state.cartList = {...cart};
+				state.cartList = {...cart}
 				//存入localStorage
-				setStore('buyCart', state.cartList);
+				setStore('cartList', state.cartList)
 			} else {
 				//商品数量为0，则清空当前商品的信息
-				item[food_id] = null;
+				item[food_id] = null
 			}
 		}
 	},
 	//网页初始化时从本地缓存获取购物车数据
-	[Types.INIT_BUYCART](state) {
-		let initCart = getStore('buyCart');
+	[Types.INIT_cartList](state) {
+		let initCart = getStore('cartList');
 		if (initCart) {
 			state.cartList = JSON.parse(initCart);
 		}
@@ -97,7 +102,7 @@ export default {
 	[Types.CLEAR_CART](state, shopid) {
 		state.cartList[shopid] = null;
 		state.cartList = {...state.cartList};
-		setStore('buyCart', state.cartList);
+		setStore('cartList', state.cartList);
 	},
 	//获取用户信息存入vuex
 	[Types.GET_USERINFO](state, info) {

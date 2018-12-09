@@ -11,16 +11,16 @@ let baseUrl = '';
 let routerMode = 'hash';
 let imgBaseUrl = 'https://fuss10.elemecdn.com';
 
-
+//开发环境
 if (process.env.NODE_ENV == 'development') {
-	baseUrl = 'http://localhost:1337'
-    imgBaseUrl = 'http://localhost:8080/img/';
-
+	baseUrl = '//elm.cangdu.org';
+    imgBaseUrl = '//elm.cangdu.org/img/';
 }else if(process.env.NODE_ENV == 'production'){
-	// baseUrl = '//elm.cangdu.org';
- //    imgBaseUrl = '//elm.cangdu.org/img/';
- 	baseUrl = 'http://localhost:1337';
- 	imgBaseUrl = 'http://localhost:8080/img/';
+	//线上环境（生产环境）
+	baseUrl = '//elm.cangdu.org';
+    imgBaseUrl = '//elm.cangdu.org/img/';
+ 	// baseUrl = 'http://localhost:1337';
+ 	// imgBaseUrl = 'http://localhost:8000/img/';
 }
 
 export {

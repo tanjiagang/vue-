@@ -1,7 +1,10 @@
 <template>
     <div class="confirmOrderContainer">
         <section v-if="!showLoading">
-            <head-top head-title="确认订单" goBack="true" signin-up='confirmOrder'></head-top>
+            <head-top head-title="确认订单" goBack="true" signin-up='confirmOrder'>
+                <span @click="$router.go(-1)" slot="logo"><</span> 
+                <span slot="head-title" class="head-title">&nbsp;</span> 
+            </head-top>
             <router-link :to='{path: "/confirmOrder/chooseAddress", query: {id: checkoutData.cart.id, sig: checkoutData.sig}}' class="address_container">
                 <div class="address_empty_left">
                     <svg class="location_icon">
@@ -53,7 +56,7 @@
                 </header>
                 <ul class="food_list_ul" v-if="checkoutData.cart.groups">
                     <li v-for="item in checkoutData.cart.groups[0]" :key="item.id" class="food_item_style">
-                        <p class="food_name ellipsis">{{item.name}}</p>
+                        <p class="food_name ellipsis">{{(item.name.split('-'))[0]}}</p>
                         <div class="num_price">
                             <span>x {{item.quantity}}</span>
                             <span>¥{{item.price}}</span>
@@ -158,11 +161,10 @@ export default {
         this.geohash = this.$route.query.geohash;
         //获取上个页面传递过来的shopid值
         this.shopId = this.$route.query.shopId;
-        this.INIT_BUYCART();
+        this.INIT_cartList();
         this.SAVE_SHOPID(this.shopId);
         //获取当前商铺购物车信息
-        // this.shopCart = this.cartList[this.shopId];
-        this.shopCart = (window.localStorage.getItem('cartList'))[this.shopId]
+        this.shopCart = this.cartList[this.shopId];
     },
     mounted(){
         if (this.geohash) {
@@ -170,9 +172,10 @@ export default {
             this.SAVE_GEOHASH(this.geohash);
         }
         if (!(this.userInfo && this.userInfo.user_id)) {
-            // this.showAlert = true;
-            // this.alertText = '您还没有登录';
+            this.showAlert = true;
+            this.alertText = '您还没有登录';
         }
+
     },
     components: {
         headTop,
@@ -201,7 +204,7 @@ export default {
     },
     methods: {
         ...mapMutations([
-            'INIT_BUYCART', 'SAVE_GEOHASH', 'CHOOSE_ADDRESS', 'NEED_VALIDATION', 'SAVE_CART_ID_SIG', 'SAVE_ORDER_PARAM', 'ORDER_SUCCESS', 'SAVE_SHOPID'
+            'INIT_cartList', 'SAVE_GEOHASH', 'CHOOSE_ADDRESS', 'NEED_VALIDATION', 'SAVE_CART_ID_SIG', 'SAVE_ORDER_PARAM', 'ORDER_SUCCESS', 'SAVE_SHOPID'
         ]),
         //初始化数据
         async initData(){
@@ -209,6 +212,7 @@ export default {
             Object.values(this.shopCart).forEach(categoryItem => {
                 Object.values(categoryItem).forEach(itemValue=> {
                     Object.values(itemValue).forEach(item => {
+                        if(typeof item == 'string') return
                         newArr.push({
                             attrs: [],
                             extra: {},
@@ -229,6 +233,7 @@ export default {
             this.SAVE_CART_ID_SIG({cart_id: this.checkoutData.cart.id, sig:  this.checkoutData.sig})
             this.initAddress();
             this.showLoading = false;
+            console.log(this.checkoutData)
         },
         //获取地址信息，第一个地址为默认选择地址
         async initAddress(){

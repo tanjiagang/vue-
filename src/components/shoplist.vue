@@ -1,6 +1,6 @@
 <template>
 	<div>
-		<ul class="shopList-wrap">
+		<ul v-load-more="loaderMore"  class="shopList-wrap" >
 			<router-link 
 				:to="{path: '/shop', query: {geohash, id: item.id}}"
 				tag="li"
@@ -9,7 +9,7 @@
 				:key="item.id"
 			>
 				<section>
-					<img class="shop_img" :src="'http://localhost:8000/img/' + item.image_path"/>
+					<img class="shop_img" :src="'//elm.cangdu.org/img/' + item.image_path"/>
 				</section>
 
 				<section class="shop_right">
@@ -59,7 +59,7 @@ import RatingStar from '@/components/ratingStar'
 import Loading from '@/components/loading'
 import {imgBaseUrl} from '@/config/env'
 import {shopList} from '@/service/getData2'
-import {getImgPath} from '@/components/mixins'
+import {getImgPath, loadMore} from '@/components/mixins'
 export default {
 	name: 'ShopList',
 	props: [
@@ -72,7 +72,8 @@ export default {
 		'geohash'
 	],
 	mixins: [
-		getImgPath
+		getImgPath,
+		loadMore
 	],
 	components: {
 		RatingStar,
@@ -83,6 +84,7 @@ export default {
 			offset: 0, //每次加载的个数
 			shopListArr:[], // 店铺列表数据
 			hasMore: false, //没有更多数据
+			preventRepeatReuqest: false, //到达底部加载数据，防止重复加载
 			imgBaseUrl: '',
 			showLoading: true
 		}
@@ -115,7 +117,36 @@ export default {
 			}
 			return zhunStatus
 		},
+		//到达底部加载更多数据
+		async loaderMore(){
+			if (this.touchend) {
+				return
+			}
+			//防止重复请求
+			if (this.preventRepeatReuqest) {
+				return
+			}
+			this.showLoading = true;
+			this.preventRepeatReuqest = true;
+
+			//数据的定位加20位
+			this.offset += 20;
+			let res = await shopList(this.latitude, this.longitude, this.offset, this.restaurantCategoryId);
+			this.hideLoading();
+			this.shopListArr = [...this.shopListArr, ...res];
+			//当获取数据小于20，说明没有更多数据，不需要再次请求数据
+			if (res.length < 20) {
+				this.touchend = true;
+				return
+			}
+			this.preventRepeatReuqest = false;
+		},
+		async loadMore(event) {
+			let el = event.target
+			console.log(el)
+		}
 	},
+
 	mounted () {
 		this.initData()
 	}
@@ -132,8 +163,7 @@ export default {
 	display: flex;
 	border-bottom: 0.025rem solid #f1f1f1;
 	padding: 0.7rem 0.4rem;
-	@include font(.5rem,1rem)
-
+	@include font(.4rem,1rem);
 }
 .shop_img{
 	@include wh(2.7rem, 2.7rem);
@@ -148,7 +178,7 @@ export default {
 	.shop-name {
 		display: inline-block;
 		padding: 0 .2rem;
-		@include font(.7rem, 1rem);
+		@include font(.6rem, 1rem);
 		font-weight: 900;
 	}
 	& > section {
@@ -161,24 +191,29 @@ export default {
 		justify-content: flex-end;
 		li {
 			color: #AAA;
+			@include font(.4rem, 1rem)
 		}
 	}
 	.rating_count {
 		color: #FA0;
-		@include font(.6rem, 1rem)
+		@include font(.4rem, 1rem)
 	}
 	.order_num {
 		display: inline-block;
 		padding: 0 .3rem;
-		@include font(.1rem, 1rem)
+		@include font(.4rem, 1rem)
 	}
 	.rating_order_num_right {
 		flex: auto;
 		text-align: right;
 		& span {
-			border: 1px solid #00F;
+			// border: 1px solid #00F;
+			padding: 3px;
 			border-radius: 3px;
-			@include font(.2rem, 1rem)
+			background: #12addc;
+			color: #FFF;
+			@include font(.4rem, 1rem)
+
 		}
 	}
 	.distance {
@@ -191,6 +226,8 @@ export default {
 
 		}
 	}
-	
+	section:nth-of-type(3) {
+		color: #666;
+	}
 }
 </style>
