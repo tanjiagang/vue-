@@ -1,7 +1,11 @@
  <template>
     <div class="order_page">
-        <head-top head-title="订单列表" go-back='true'></head-top>
-        <ul class="order_list_ul" v-load-more="loaderMore">
+        <head-top head-title="订单列表" go-back='true'>
+					<span slot="logo" @click="$router.go(-1)" class="back"><</span>
+					<h3 class="head-title" slot="head-title">订单列表</h3>
+
+				</head-top>
+        <ul class="order_list_ul">
             <li class="order_list_li" v-for="item in orderList" :key="item.id">
                 <img :src="imgBaseUrl + item.restaurant_image_url" class="restaurant_image">
                 <section class="order_item_right">
@@ -56,6 +60,7 @@
 
 
     export default {
+			props: [],
       data(){
             return{
                 orderList: null, //订单列表
@@ -68,7 +73,7 @@
         mounted(){
             this.initData();
         },
-        mixins: [loadMore],
+      
         components: {
             headTop,
             footGuide,

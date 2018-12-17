@@ -53,7 +53,7 @@
     	transform: translateY(0px);
     	animation: load .6s infinite ease-in-out;
     	position: relative;
-    	z-index: 11;
+    	z-index: 999;
     }
 	.load_ellipse{
 		position: absolute;

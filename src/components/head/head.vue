@@ -74,6 +74,7 @@ export default {
 .panel {
 	color: #FFF;
     flex: 1;
+	@include font(0.7rem, 1rem)
 }
 .head_goback{
     left: 0.4rem;

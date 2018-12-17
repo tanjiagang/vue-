@@ -13,8 +13,8 @@
 				</section> 
 			</div>
 			<div class="discount">
-				{{shopDetail.activities[0] ? shopDetail.activities[0].description : ''}}（APP专享）
-				<span>{{shopDetail.activities.length}}个活动></span>
+				<!-- {{shopDetail.activities[0] ? shopDetail.activities[0].description : ''}}（APP专享）
+				<span>{{shopDetail.activities.length}}个活动></span> -->
 			</div>
 		</header>
 		<ul class="toggle">
@@ -91,7 +91,7 @@ export default {
 			shopDetail: {
 				activities: [1,2]
 			}, //店铺详情
-			shopId: 1, //店铺ID		
+			shopId: 0, //店铺ID		
 			imgBaseUrl: '//elm.cangdu.org/img/',
 			showType: 'food',
 			cartNum: 0, //购物车数量
@@ -210,14 +210,14 @@ export default {
 	color: #FFF;
 	left: 2%;
 	top: .5%;
-	@include font(1.6rem,1rem)
+	@include font(1rem,1rem)
 }
 .detail-btn {
-	left: 90%;
-	top: 7%;
+	left: 93%;
+	top: 5.5%;
 }
 header {
-	height: 20vh;
+	height: 18vh;
     overflow-y: hidden;
 	padding: 2%;
 	color: #FFF;
@@ -226,7 +226,7 @@ header {
 	.top {
 		display: flex;
 		width: 100%;
-		padding-top: 3%;
+		padding-top: 4%;
 		img {
 			width: 2.9rem;
 			height: 2.9rem;

@@ -32,7 +32,7 @@
             </svg>
             <span>搜索</span>
         </section>
-        <section @click = "gotoAddress('/profile')" class="guide_item">
+        <section @click = "$router.push('order')" class="guide_item">
             <svg class="icon_style">
                 <use xmlns:xlink="http://www.w3.org/1999/xlink" :xlink:href="$route.path.indexOf('order') !== -1? '#orderActive' : '#order'"></use>
             </svg>

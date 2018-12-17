@@ -6,8 +6,14 @@ import router from './router'
 import store from './store'
 import '@/style/common.css'
 import '@/style/iconfont.css'
+import iView from 'iview';
+import 'iview/dist/styles/iview.css';
+import MintUI from 'mint-ui'
+import 'mint-ui/lib/style.css'
 import '@/config/rem.js'
 import FastClick from 'fastclick'
+
+
 if ('addEventListener' in document) {
 	document.addEventListener('DOMContentLoaded', function() {
 		FastClick.attach(document.body);
@@ -15,6 +21,8 @@ if ('addEventListener' in document) {
 }
 
 Vue.config.productionTip = false
+Vue.use(iView);
+Vue.use(MintUI)
 
 /* eslint-disable no-new */
 new Vue({

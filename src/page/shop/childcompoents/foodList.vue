@@ -29,7 +29,10 @@
 				</header>
 				<router-link
 					v-for="(foodItem, index) in item.foods"
-					to="/"
+					:to="{path: 'shop/foodDetail', 
+						query:{image_path:foodItem.image_path, description: foodItem.description, 
+						month_sales: foodItem.month_sales, name: foodItem.name, rating: foodItem.rating, 
+						rating_count: foodItem.rating_count, satisfy_rate: foodItem.satisfy_rate, foodItem, shopId}}"
 					tag="section"
 					:key="index"
 				>
@@ -68,6 +71,7 @@ import {getImagePath, getStore, setStore, animate, log} from '@/config/mUtil'
 import {mapState, mapMutations} from 'vuex'
 export default {
 	name: 'foodList',
+	props: ['shopId'],
 	data () {
 		return {
 			foodMenu: [],
@@ -328,14 +332,15 @@ export default {
 		background: #FFF;
 		li{
 			padding: .7rem .3rem;
-			color: #333;
+			font-size: 13px;
+			font-weight: bold;
+			color: #666;
 		    border-bottom: 0.025rem solid #ededed;
 		    box-sizing: border-box;
 		    border-left: 0.15rem solid #f8f8f8;
 		    position: relative;
 		    word-wrap: berak-word;
 		    background: #f7f4f4;
-		    @include font(.8rem, 1rem)
 		    img {
 			    width: 0.5rem;
 	    		height: 0.6rem;
@@ -369,15 +374,18 @@ export default {
 	.menu-right {
 		flex: 4;
 		width: 70%;
-		height: 70vh;
+		height: 72vh;
+		overflow-x: hidden;
 		overflow-y: auto;
 		position: relative;
 		header {
-			padding: .8rem;
+			padding: .5rem;
 			color: #AAA;
-			@include font(.6rem);
+			background: #f5f5f5;
+			@include font(.4rem);
 			span {
-				color: #666;
+				color: #000;
+				font-weight: 900;
 				@include font(.8rem)
 			}
 		}
@@ -385,9 +393,17 @@ export default {
 			display: flex;
 			background: #FFF;
 			padding: .3rem;
-			@include font(.6rem,1rem)
+			@include font(.4rem,1rem)
+
 			h4 {
-				@include font(.8rem,1rem)
+				font-weight: 900;
+				color: #000;
+				font-family: '黑体';
+				@include font(.7rem,1rem)
+			}
+			p:nth-of-type(2) {
+				
+				font-weight: bold;
 			}
 			.food-text {
 				width: 100%;
@@ -416,7 +432,7 @@ export default {
 					height: .8rem;
 					text-align: center;
 					line-height: .8rem;
-					background: #00F;
+					background: #318fe6;
 					color: #FFF;
 					cursor: pointer;
 					border-radius: 50%;

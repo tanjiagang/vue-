@@ -1,6 +1,6 @@
 <template>
-	<div>
-		<ul v-load-more="loaderMore"  class="shopList-wrap" >
+	<div ref="shopListWrap">
+		<ul   class="shopList-wrap" >
 			<router-link 
 				:to="{path: '/shop', query: {geohash, id: item.id}}"
 				tag="li"
@@ -22,11 +22,10 @@
 					</section>
 
 					<section>
-						<rating-star :rating="item.rating"></rating-star>
+						<rate :value="item.rating"></rate>						
 						<span class="rating_count">{{item.rating}}</span>
 						<span class="order_num">月售{{item.recent_order_num}}单</span>
 						<section class="rating_order_num_right">
-							<span class="delivery_style delivery_left" v-if="item.delivery_mode">{{item.delivery_mode.text}}</span>
 							<span class="delivery_style delivery_right" v-if="zhunshi(item.supports)">准时达</span>
 						</section>
 					</section>
@@ -50,12 +49,20 @@
 		<transition name="loading">
 			<loading v-show="showLoading"></loading>
 		</transition>
+		<transition name="loading">
+			<spin v-show="isMore"></spin>
+		</transition>
+		<div style="text-align: center;" v-show="touchend">没有更多了</div>
+		<back-top></back-top>
 	</div>
 </template>
 
 <script>
 import {mapState} from 'vuex'
 import RatingStar from '@/components/ratingStar'
+import Rate from '@/components/rate'
+import Spin from '@/components/spin'
+import BackTop from '@/components/backTop'
 import Loading from '@/components/loading'
 import {imgBaseUrl} from '@/config/env'
 import {shopList} from '@/service/getData2'
@@ -78,6 +85,9 @@ export default {
 	components: {
 		RatingStar,
 		Loading,
+		Rate,//评分组件
+		Spin,//加载组件
+		BackTop,//回到顶部
 	},
 	data () {
 		return {
@@ -86,7 +96,9 @@ export default {
 			hasMore: false, //没有更多数据
 			preventRepeatReuqest: false, //到达底部加载数据，防止重复加载
 			imgBaseUrl: '',
-			showLoading: true
+			showLoading: true,
+			touchend: false, //是否有更多
+			isMore: false, //加载更多
 		}
 	},
 	computed: {
@@ -99,7 +111,7 @@ export default {
 			//获取数据
 			let res = await shopList(this.latitude, this.longitude, this.offset, this.restaurantCategoryId)
 			this.shopListArr = [...res]
-			this.showLoading = false;
+			this.showLoading = false
 			if (res.length < 20) {
 				this.hasMore = true
 			}
@@ -113,7 +125,7 @@ export default {
  					}
  				})
 			}else{
-				zhunStatus = false;
+				zhunStatus = false
 			}
 			return zhunStatus
 		},
@@ -126,29 +138,32 @@ export default {
 			if (this.preventRepeatReuqest) {
 				return
 			}
-			this.showLoading = true;
+			this.isMore = true;
 			this.preventRepeatReuqest = true;
 
 			//数据的定位加20位
-			this.offset += 20;
+			this.offset += 5;
 			let res = await shopList(this.latitude, this.longitude, this.offset, this.restaurantCategoryId);
-			this.hideLoading();
+			this.isMore = false
 			this.shopListArr = [...this.shopListArr, ...res];
 			//当获取数据小于20，说明没有更多数据，不需要再次请求数据
-			if (res.length < 20) {
+			if (res.length < 5) {
 				this.touchend = true;
 				return
 			}
 			this.preventRepeatReuqest = false;
 		},
-		async loadMore(event) {
-			let el = event.target
-			console.log(el)
-		}
 	},
-
 	mounted () {
 		this.initData()
+		let shopListWrap = this.$refs.shopListWrap
+		window.addEventListener('scroll',  ()=>{
+			var scrollTop = document.documentElement.scrollTop || document.body.scrollTop
+			if(scrollTop + window.screen.height >= shopListWrap.offsetHeight + shopListWrap.offsetTop){
+				this.loaderMore()
+			}
+			
+		}, {passive: true})
 	}
 }
 </script>
@@ -157,23 +172,28 @@ export default {
 @import '~@/style/mixin';
 .shopList-wrap{
 	background-color: #fff;
-	margin-bottom: 2rem;
 }
 .shop_li{
 	display: flex;
 	border-bottom: 0.025rem solid #f1f1f1;
 	padding: 0.7rem 0.4rem;
-	@include font(.4rem,1rem);
+	@include font(.6rem,1rem);
 }
 .shop_img{
 	@include wh(2.7rem, 2.7rem);
 	display: block;
-	margin-right: 0.4rem;
+	margin-right: 0.6rem;
 }
 .shop_right{
 	flex: auto;
+	& > section {
+		display: flex;
+		margin-bottom: .2rem;
+	}
 	.brand {
 		background: yellow;
+		font-weight: 900;
+		@include font(0.4rem, 1rem);		
 	}
 	.shop-name {
 		display: inline-block;
@@ -181,10 +201,7 @@ export default {
 		@include font(.6rem, 1rem);
 		font-weight: 900;
 	}
-	& > section {
-		display: flex;
-		margin: .1rem 0;
-	}
+
 	.shop_supports {
 		flex: auto;
 		display: flex;
@@ -196,7 +213,7 @@ export default {
 	}
 	.rating_count {
 		color: #FA0;
-		@include font(.4rem, 1rem)
+		@include font(.6rem, 1rem)
 	}
 	.order_num {
 		display: inline-block;
@@ -207,7 +224,6 @@ export default {
 		flex: auto;
 		text-align: right;
 		& span {
-			// border: 1px solid #00F;
 			padding: 3px;
 			border-radius: 3px;
 			background: #12addc;
@@ -227,7 +243,15 @@ export default {
 		}
 	}
 	section:nth-of-type(3) {
-		color: #666;
+		color: #999;
+		@include font(0.4rem,1rem)
 	}
 }
+.ivu-rate {
+	font-size: 13px;
+}
+.ivu-rate-star {
+    margin-right: 2px;
+}
+
 </style>
